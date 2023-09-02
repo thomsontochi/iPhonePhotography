@@ -4,11 +4,13 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Comment;
+use App\Models\Achievement;
 use App\Models\WatchedLesson;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -53,5 +55,16 @@ class User extends Authenticatable
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+
+    public function unlocked_achievements(): BelongsToMany
+    {
+        return $this->belongsToMany(Achievement::class)->withTimestamps();
+        // return $this->belongsToMany(Achievement::class, 'user_achievements')->withTimestamps();
+    }
+
+    public function achievements()
+    {
+        return $this->belongsToMany(Achievement::class);
     }
 }

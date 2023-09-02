@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class WatchedLesson extends Model
 {
     use HasFactory;
+
+    protected $factory = WatchedLessonFactory::class;
 }
