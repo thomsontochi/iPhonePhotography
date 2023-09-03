@@ -126,14 +126,44 @@ class User extends Authenticatable
 
 
 
+    // public function getNextAvailableAchievements()
+    // {
+    //     // Logic to determine the next available achievements regardless of groups
+
+    //     $nextAvailableAchievements = Achievement::whereNotIn('name', $this->unlocked_achievements->pluck('name'))
+    //         ->pluck('name')->toArray();
+
+    //     return $nextAvailableAchievements;
+    // }
+
     public function getNextAvailableAchievements()
     {
-        // Logic to determine the next available achievements regardless of groups
+        $unlockedAchievements = $this->unlocked_achievements->pluck('name')->toArray();
+        $availableAchievements = [];
 
-        $nextAvailableAchievements = Achievement::whereNotIn('name', $this->unlocked_achievements->pluck('name'))
-            ->pluck('name')->toArray();
+        // Group achievements by their group attribute
+        // $groupedAchievements = Achievement::whereIn('name', $unlockedAchievements)
+        //     ->groupBy('group')
+        //     ->pluck('name')
+        //     ->toArray();
+        $groupedAchievements = Achievement::whereIn('name', $unlockedAchievements)
+            ->groupBy(['group', 'name'])
+            ->pluck('name')
+            ->toArray();
 
-        return $nextAvailableAchievements;
+
+        // Find the next available achievement for each group
+        foreach ($groupedAchievements as $group) {
+            $nextAchievement = Achievement::whereNotIn('name', $unlockedAchievements)
+                ->where('group', $group)
+                ->first();
+
+            if ($nextAchievement) {
+                $availableAchievements[$group] = $nextAchievement->name;
+            }
+        }
+
+        return $availableAchievements;
     }
 
 
