@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
+use App\Models\Lesson;
 use App\Models\WatchedLesson;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -19,10 +21,13 @@ class WatchedLessonFactory extends Factory
     public function definition(): array
     {
        
-        return [
-            'user_id' => 1,
-            'lesson_id' => 1, 
-            
-        ];
+       // Get random user and lesson IDs from your database
+       $userIds = User::pluck('id')->toArray();
+       $lessonIds = Lesson::pluck('id')->toArray();
+
+       return [
+           'user_id' => $this->faker->randomElement($userIds),
+           'lesson_id' => $this->faker->randomElement($lessonIds),
+       ];
     }
 }

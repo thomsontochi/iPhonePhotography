@@ -2,15 +2,16 @@
 
 namespace Database\Factories;
 
-use App\Models\Achievement;
+use App\Models\Badge;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Achievement>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
  */
-class AchievementFactory extends Factory
+class BadgeFactory extends Factory
 {
-    protected $model = Achievement::class;
+    protected $model = Badge::class;
+    
     /**
      * Define the model's default state.
      *
@@ -19,7 +20,7 @@ class AchievementFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->name,
+            'name' => $this->faker->word,
             'description' => $this->faker->sentence(),
         ];
     }

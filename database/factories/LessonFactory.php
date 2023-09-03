@@ -23,6 +23,7 @@ class LessonFactory extends Factory
     {
         return [
             'title' => $this->faker->sentence(),
+            'content' => $this->faker->sentence(),
         ];
     }
 }

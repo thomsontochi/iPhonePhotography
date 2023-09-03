@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Lesson;
 use App\Models\Comment;
 use App\Models\Achievement;
 use App\Models\WatchedLesson;
@@ -51,6 +52,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(WatchedLesson::class);
     }
+
+    public function watchedLessons()
+    {
+        return $this->belongsToMany(Lesson::class)->withTimestamps();
+    }
+
 
     public function comments()
     {
@@ -104,7 +111,7 @@ class User extends Authenticatable
 
         if ($nextBadge) {
             // Logic specific to your badge unlocking criteria
-            
+
             $requiredAchievements = $this->getRequiredAchievementsForBadge($nextBadge);
 
             // Calculate the remaining achievements needed for the next badge
@@ -121,22 +128,29 @@ class User extends Authenticatable
 
     public function getNextAvailableAchievements()
     {
-        // Logic to determine the next available achievements for each group
+        // Logic to determine the next available achievements regardless of groups
 
-        $nextAvailableLessons = Achievement::whereNotIn('name', $this->unlocked_achievements->pluck('name'))
-            ->where('group', 'Lessons Watched')
+        $nextAvailableAchievements = Achievement::whereNotIn('name', $this->unlocked_achievements->pluck('name'))
             ->pluck('name')->toArray();
 
-        $nextAvailableComments = Achievement::whereNotIn('name', $this->unlocked_achievements->pluck('name'))
-            ->where('group', 'Comments Written')
-            ->pluck('name')->toArray();
+        return $nextAvailableAchievements;
+    }
 
 
 
-        return [
-            'Lessons Watched' => $nextAvailableLessons,
-            'Comments Written' => $nextAvailableComments,
+    public function getRequiredAchievementsForBadge($badgeName)
+    {
 
-        ];
+
+        switch ($badgeName) {
+            case 'Intermediate':
+                return 4; // The Intermediate badge requires 4 achievements
+            case 'Advanced':
+                return 8; // The Advanced badge requires 8 achievements
+            case 'Master':
+                return 10; // The Master badge requires 10 achievements
+            default:
+                return 0; // Default case, no required achievements
+        }
     }
 }
