@@ -183,4 +183,23 @@ class User extends Authenticatable
                 return 0; // Default case, no required achievements
         }
     }
+
+    public function unlockBadge()
+    {
+        $unlockedAchievements = $this->unlocked_achievements()->count();
+
+        if ($unlockedAchievements >= 10) {
+            // Award the Master badge
+            $this->badges()->attach(Badge::where('name', 'Master')->first());
+        } elseif ($unlockedAchievements >= 8) {
+            // Award the Advanced badge
+            $this->badges()->attach(Badge::where('name', 'Advanced')->first());
+        } elseif ($unlockedAchievements >= 4) {
+            // Award the Intermediate badge
+            $this->badges()->attach(Badge::where('name', 'Intermediate')->first());
+        } elseif ($unlockedAchievements >= 0) {
+            // Award the Beginner badge
+            $this->badges()->attach(Badge::where('name', 'Beginner')->first());
+        }
+    }
 }
