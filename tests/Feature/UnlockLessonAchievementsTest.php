@@ -28,12 +28,18 @@ class UnlockLessonAchievementsTest extends TestCase
     {
         // Create a user
         $user = User::factory()->create();
-    
+
         // Create a lesson (adjust the details based on your implementation)
         $lesson = Lesson::factory()->create();
+
+        $user->lessons()->attach($lesson->id);
+
+        // dd($user);
     
         // Simulate a user watching lessons
         LessonWatched::dispatch($lesson, $user); // Dispatch the LessonWatched event
+
+         dd($user->unlocked_achievements);
     
         // Assert that the user unlocks the 'First Lesson Watched' achievement
        $this->assertTrue($user->unlocked_achievements->contains('First Lesson Watched'));

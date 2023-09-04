@@ -25,7 +25,7 @@ class UnlockLessonAchievements
     public function handle(LessonWatched $event)
     {
         $user = $event->user;
-        $watchedLessonsCount = $user->watched()->count();
+        $watchedLessonsCount = $user->lessons()->count();
 
         if ($watchedLessonsCount >= 1) {
             $this->unlockAchievement($user, 'First Lesson Watched');
@@ -34,6 +34,7 @@ class UnlockLessonAchievements
             $this->unlockAchievement($user, '5 Lessons Watched');
         }
     }
+
 
     private function unlockAchievement($user, $achievementName)
     {
@@ -83,6 +84,8 @@ class UnlockLessonAchievements
             // Assuming you have a Badge model to store badges
             $badge = Badge::where('name', $currentBadge)->first();
             if ($badge) {
+                // Load the user's badges
+                $user->load('badges');
                 // Check if the user already has this badge to avoid duplicate attachments
                 if (!$user->badges->contains('name', $badge->name)) {
                     // Attach the badge to the user
@@ -90,5 +93,6 @@ class UnlockLessonAchievements
                 }
             }
         }
+        
     }
 }

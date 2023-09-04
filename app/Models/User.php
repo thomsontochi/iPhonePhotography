@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Badge;
 use App\Models\Lesson;
 use App\Models\Comment;
 use App\Models\Achievement;
@@ -80,6 +81,14 @@ class User extends Authenticatable
         return $this->belongsToMany(Achievement::class);
     }
 
+    // User.php (User model)
+
+    public function badges()
+    {
+        return $this->belongsToMany(Badge::class)->withTimestamps();
+    }
+
+
     public function getCurrentBadge()
     {
         // Logic to determine the user's current badge based on unlocked achievements
@@ -144,30 +153,26 @@ class User extends Authenticatable
     public function getNextAvailableAchievements()
     {
         $unlockedAchievements = $this->unlocked_achievements->pluck('name')->toArray();
+
         $availableAchievements = [];
 
-        // Group achievements by their group attribute
-        // $groupedAchievements = Achievement::whereIn('name', $unlockedAchievements)
-        //     ->groupBy('group')
-        //     ->pluck('name')
-        //     ->toArray();
-        $groupedAchievements = Achievement::whereIn('name', $unlockedAchievements)
-            ->groupBy(['group', 'name'])
-            ->pluck('name')
-            ->toArray();
+       // Get all the unique achievement groups (excluding NULL values)
+       $groups = Achievement::whereIn('name', $unlockedAchievements)
+       ->pluck('name')
+       ->toArray();
 
 
-        // Find the next available achievement for each group
-        foreach ($groupedAchievements as $group) {
+        foreach ($groups as $group) {
             $nextAchievement = Achievement::whereNotIn('name', $unlockedAchievements)
-                ->where('group', $group)
+                ->where('name', '!=', $group) // Exclude the already unlocked achievement from the same group
+                ->orderBy('id') // Add order by to ensure consistent results
                 ->first();
-
+    
             if ($nextAchievement) {
-                $availableAchievements[$group] = $nextAchievement->name;
+                $availableAchievements[] = $nextAchievement->name;
             }
         }
-
+    
         return $availableAchievements;
     }
 

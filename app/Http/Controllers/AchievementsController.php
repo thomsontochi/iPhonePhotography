@@ -12,8 +12,12 @@ class AchievementsController extends Controller
     public function index(User $user)
     {
         // Get the user's unlocked achievements
+
+        
        
         $unlockedAchievements = $user->unlocked_achievements->pluck('name')->toArray();
+
+        // dd($unlockedAchievements);
        
         // Get the user's current badge
         $currentBadge = $user->getCurrentBadge();
@@ -26,7 +30,6 @@ class AchievementsController extends Controller
         // Get the next available achievements 
         $nextAvailableAchievements = $user->getNextAvailableAchievements();
 
-        // dd($nextAvailableAchievements);
 
         // Return the data as a JSON response
         return response()->json([
