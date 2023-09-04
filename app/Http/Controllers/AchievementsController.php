@@ -12,8 +12,6 @@ class AchievementsController extends Controller
     public function index(User $user)
     {
         // Get the user's unlocked achievements
-
-        
        
         $unlockedAchievements = $user->unlocked_achievements->pluck('name')->toArray();
 

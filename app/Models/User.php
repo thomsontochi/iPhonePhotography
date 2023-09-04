@@ -140,14 +140,31 @@ class User extends Authenticatable
 
 
 
+
     // public function getNextAvailableAchievements()
     // {
-    //     // Logic to determine the next available achievements regardless of groups
+    //     $unlockedAchievements = $this->unlocked_achievements->pluck('name')->toArray();
 
-    //     $nextAvailableAchievements = Achievement::whereNotIn('name', $this->unlocked_achievements->pluck('name'))
-    //         ->pluck('name')->toArray();
+    //     $availableAchievements = [];
 
-    //     return $nextAvailableAchievements;
+    //     // Get all the unique achievement groups (excluding NULL values)
+    //     $groups = Achievement::whereIn('name', $unlockedAchievements)
+    //         ->pluck('name')
+    //         ->toArray();
+
+
+    //     foreach ($groups as $group) {
+    //         $nextAchievement = Achievement::whereNotIn('name', $unlockedAchievements)
+    //             ->where('name', '!=', $group) // Exclude the already unlocked achievement from the same group
+    //             ->orderBy('id') // Add order by to ensure consistent results
+    //             ->first();
+
+    //         if ($nextAchievement) {
+    //             $availableAchievements[] = $nextAchievement->name;
+    //         }
+    //     }
+
+    //     return $availableAchievements;
     // }
 
     public function getNextAvailableAchievements()
@@ -156,25 +173,28 @@ class User extends Authenticatable
 
         $availableAchievements = [];
 
-       // Get all the unique achievement groups (excluding NULL values)
-       $groups = Achievement::whereIn('name', $unlockedAchievements)
-       ->pluck('name')
-       ->toArray();
+        // Define the order of achievements
+        $achievementOrder = [
+            'First Lesson Watched',
+            '5 Lessons Watched',
+            '10 Lessons Watched',
+            '25 Lessons Watched',
+            '50 Lessons Watched',
+           
+        ];
 
-
-        foreach ($groups as $group) {
-            $nextAchievement = Achievement::whereNotIn('name', $unlockedAchievements)
-                ->where('name', '!=', $group) // Exclude the already unlocked achievement from the same group
-                ->orderBy('id') // Add order by to ensure consistent results
-                ->first();
-    
-            if ($nextAchievement) {
-                $availableAchievements[] = $nextAchievement->name;
+        // Loop through achievements in order
+        foreach ($achievementOrder as $achievementName) {
+            if (!in_array($achievementName, $unlockedAchievements)) {
+                // This is the next available achievement
+                $availableAchievements[] = $achievementName;
+                break; // Exit the loop once found
             }
         }
-    
+
         return $availableAchievements;
     }
+
 
 
 
