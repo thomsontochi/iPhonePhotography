@@ -53,10 +53,15 @@ class User extends Authenticatable
         return $this->hasMany(WatchedLesson::class);
     }
 
-    public function watchedLessons()
+    public function lessons()
     {
         return $this->belongsToMany(Lesson::class)->withTimestamps();
     }
+
+    // public function watchedLessons()
+    // {
+    //     return $this->belongsToMany(Lesson::class)->withTimestamps();
+    // }
 
 
     public function comments()

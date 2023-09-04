@@ -57,23 +57,37 @@ class UnlockLessonAchievements
 
     private function attachBadge($user, $achievement)
     {
-        // Check the achievement's name to determine which badge to attach
-        switch ($achievement->name) {
-            case '5 Lessons Watched':
-                // Assuming you have a Badge model to store badges
-                $badge = Badge::where('name', 'Bronze Badge')->first();
+        // Check the user's total unlocked achievements to determine the appropriate badge
+        $totalAchievements = $user->unlocked_achievements->count();
+
+        // Define the badge names and their corresponding achievement counts
+        $badgeMap = [
+            'Beginner' => 0,
+            'Intermediate' => 4,
+            'Advanced' => 8,
+            'Master' => 10,
+        ];
+
+        // Determine the user's current badge
+        $currentBadge = null;
+        foreach ($badgeMap as $badgeName => $achievementCount) {
+            if ($totalAchievements >= $achievementCount) {
+                $currentBadge = $badgeName;
+            } else {
                 break;
-                // Add more cases for other achievements and their associated badges
-            default:
-                $badge = null;
+            }
         }
 
-        // Attach the badge to the user if a valid badge was found
-        if ($badge) {
-            // Check if the user already has this badge to avoid duplicate attachments
-            if (!$user->badges->contains('name', $badge->name)) {
-                // Attach the badge to the user
-                $user->badges()->attach($badge->id);
+        // Attach the current badge to the user
+        if ($currentBadge) {
+            // Assuming you have a Badge model to store badges
+            $badge = Badge::where('name', $currentBadge)->first();
+            if ($badge) {
+                // Check if the user already has this badge to avoid duplicate attachments
+                if (!$user->badges->contains('name', $badge->name)) {
+                    // Attach the badge to the user
+                    $user->badges()->attach($badge->id);
+                }
             }
         }
     }

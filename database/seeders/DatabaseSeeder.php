@@ -7,6 +7,7 @@ use App\Models\Lesson;
 use Illuminate\Database\Seeder;
 use Database\Seeders\BadgeSeeder;
 use Database\Seeders\CommentSeeder;
+use Database\Seeders\LessonUserSeeder;
 use Database\Seeders\UsersTableSeeder;
 use Database\Seeders\WatchedLessonSeeder;
 use Database\Seeders\AchievementsTableSeeder;
@@ -25,7 +26,7 @@ class DatabaseSeeder extends Seeder
                 CommentSeeder::class,
                 UsersTableSeeder::class,
                 AchievementsTableSeeder::class,
-                WatchedLessonSeeder::class,
+                LessonUserSeeder::class,
                 BadgeSeeder::class,
                
             ]);
