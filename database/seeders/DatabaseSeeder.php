@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
                 AchievementsTableSeeder::class,
                 LessonUserSeeder::class,
                 BadgeSeeder::class,
+                BadgeUserSeeder::class,
                
             ]);
     }

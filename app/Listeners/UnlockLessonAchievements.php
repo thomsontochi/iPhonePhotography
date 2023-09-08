@@ -36,6 +36,7 @@ class UnlockLessonAchievements
     }
 
 
+
     private function unlockAchievement($user, $achievementName)
     {
         // Check if the user already unlocked this achievement to avoid duplicate unlocks.
@@ -47,8 +48,8 @@ class UnlockLessonAchievements
                 // Unlock the achievement for the user
                 $user->unlocked_achievements()->attach($achievement->id);
 
-                // Attach any relevant badge if criteria are met
-                $this->attachBadge($user, $achievement);
+                // Call the assignBadges method to update badges
+                $this->assignBadges($user);
 
                 // Fire the AchievementUnlocked event
                 event(new AchievementUnlocked($achievementName, $user));
@@ -56,43 +57,51 @@ class UnlockLessonAchievements
         }
     }
 
-    private function attachBadge($user, $achievement)
-    {
-        // Check the user's total unlocked achievements to determine the appropriate badge
-        $totalAchievements = $user->unlocked_achievements->count();
 
-        // Define the badge names and their corresponding achievement counts
-        $badgeMap = [
-            'Beginner' => 0,
-            'Intermediate' => 4,
-            'Advanced' => 8,
-            'Master' => 10,
+    private function assignBadges($user)
+    {
+        // Get the user's unlocked achievements
+        $unlockedAchievements = $user->unlocked_achievements->pluck('name')->toArray();
+
+        // Define badge progression logic
+        $badgeProgression = [
+            'Beginner' => ['First Lesson Watched'],
+            'Intermediate' => ['5 Lessons Watched'],
+            'Advanced' => ['10 Lessons Watched'],
+            'Master' => ['25 Lessons Watched', '50 Lessons Watched'],
         ];
 
-        // Determine the user's current badge
-        $currentBadge = null;
-        foreach ($badgeMap as $badgeName => $achievementCount) {
-            if ($totalAchievements >= $achievementCount) {
-                $currentBadge = $badgeName;
+        // Determine the highest badge the user has achieved
+        $highestBadge = null;
+
+        foreach ($badgeProgression as $badgeName => $achievementNames) {
+            if (count(array_intersect($achievementNames, $unlockedAchievements)) === count($achievementNames)) {
+                $highestBadge = $badgeName;
             } else {
                 break;
             }
         }
 
-        // Attach the current badge to the user
-        if ($currentBadge) {
-            // Assuming you have a Badge model to store badges
-            $badge = Badge::where('name', $currentBadge)->first();
-            if ($badge) {
-                // Load the user's badges
-                $user->load('badges');
-                // Check if the user already has this badge to avoid duplicate attachments
-                if (!$user->badges->contains('name', $badge->name)) {
-                    // Attach the badge to the user
-                    $user->badges()->attach($badge->id);
-                }
-            }
+        // Assign the highest badge to the user
+        if ($highestBadge) {
+            $user->badges()->sync([$highestBadge]);
         }
-        
     }
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
 }

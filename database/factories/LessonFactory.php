@@ -21,6 +21,7 @@ class LessonFactory extends Factory
      */
     public function definition()
     {
+        
         return [
             'title' => $this->faker->sentence(),
             'content' => $this->faker->sentence(),

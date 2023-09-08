@@ -38,12 +38,12 @@ class AchievementsTableSeeder extends Seeder
         //     'description' => 'Watch 50 lessons.',
         // ]);
 
-    
+
         // Achievement::create([
         //     'name' => 'First Comment Written',
         //     'description' => 'Write your first comment.',
         // ]);
-    
+
         // Achievement::create([
         //     'name' => '3 Comments Written',
         //     'description' => 'Write 3 comments.',
@@ -69,18 +69,36 @@ class AchievementsTableSeeder extends Seeder
 
 
 
-         // Create specific achievements with the desired names and descriptions
-    $achievements = [
-        ['name' => 'First Lesson Watched', 'description' => 'Watch your first lesson.'],
-        ['name' => '5 Lessons Watched', 'description' => 'Watch 5 lessons.'],
-        ['name' => '10 Lessons Watched', 'description' => 'Watch 10 lessons.'],
-        ['name' => '25 Lessons Watched', 'description' => 'Watch 25 lessons.'],
-        ['name' => '50 Lessons Watched', 'description' => 'Watch 50 lessons.'],
-        // Add more achievements as needed
-    ];
+        // Create specific achievements with the desired names and descriptions
+        // $achievements = [
+        //     ['name' => 'First Lesson Watched', 'description' => 'Watch your first lesson.'],
+        //     ['name' => '5 Lessons Watched', 'description' => 'Watch 5 lessons.'],
+        //     ['name' => '10 Lessons Watched', 'description' => 'Watch 10 lessons.'],
+        //     ['name' => '25 Lessons Watched', 'description' => 'Watch 25 lessons.'],
+        //     ['name' => '50 Lessons Watched', 'description' => 'Watch 50 lessons.'],
+        //     // Add more achievements as needed
+        // ];
 
-    foreach ($achievements as $achievementData) {
-        Achievement::create($achievementData);
-    }
+        // foreach ($achievements as $achievementData) {
+        //     Achievement::create($achievementData);
+        // }
+
+        // Clear existing achievements to start fresh
+        Achievement::truncate();
+
+        $achievements = [
+            'First Lesson Watched',
+            '5 Lessons Watched',
+            '10 Lessons Watched',
+            '25 Lessons Watched',
+            '50 Lessons Watched',
+        ];
+
+        foreach ($achievements as $achievementName) {
+            Achievement::create([
+                'name' => $achievementName,
+                'description' => 'Description for ' . $achievementName,
+            ]);
+        }
     }
 }

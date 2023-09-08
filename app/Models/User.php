@@ -59,10 +59,6 @@ class User extends Authenticatable
         return $this->belongsToMany(Lesson::class)->withTimestamps();
     }
 
-    // public function watchedLessons()
-    // {
-    //     return $this->belongsToMany(Lesson::class)->withTimestamps();
-    // }
 
 
     public function comments()
@@ -81,8 +77,6 @@ class User extends Authenticatable
         return $this->belongsToMany(Achievement::class);
     }
 
-    // User.php (User model)
-
     public function badges()
     {
         return $this->belongsToMany(Badge::class)->withTimestamps();
@@ -91,18 +85,27 @@ class User extends Authenticatable
 
     public function getCurrentBadge()
     {
-        // Logic to determine the user's current badge based on unlocked achievements
+        $unlockedAchievementsCount = $this->unlocked_achievements->count();
 
-        if ($this->unlocked_achievements()->count() >= 10) {
-            return 'Master';
-        } elseif ($this->unlocked_achievements()->count() >= 8) {
-            return 'Advanced';
-        } elseif ($this->unlocked_achievements()->count() >= 4) {
-            return 'Intermediate';
-        } else {
-            return 'Beginner';
+        // Define badge progression thresholds
+        $badgeProgression = [
+            'Beginner' => 0,
+            'Intermediate' => 4,
+            'Advanced' => 8,
+            'Master' => 10,
+        ];
+
+        $currentBadge = 'Beginner';
+
+        foreach ($badgeProgression as $badge => $threshold) {
+            if ($unlockedAchievementsCount >= $threshold) {
+                $currentBadge = $badge;
+            }
         }
+
+        return $currentBadge;
     }
+
 
     public function getNextBadge()
     {
@@ -139,34 +142,6 @@ class User extends Authenticatable
     }
 
 
-
-
-    // public function getNextAvailableAchievements()
-    // {
-    //     $unlockedAchievements = $this->unlocked_achievements->pluck('name')->toArray();
-
-    //     $availableAchievements = [];
-
-    //     // Get all the unique achievement groups (excluding NULL values)
-    //     $groups = Achievement::whereIn('name', $unlockedAchievements)
-    //         ->pluck('name')
-    //         ->toArray();
-
-
-    //     foreach ($groups as $group) {
-    //         $nextAchievement = Achievement::whereNotIn('name', $unlockedAchievements)
-    //             ->where('name', '!=', $group) // Exclude the already unlocked achievement from the same group
-    //             ->orderBy('id') // Add order by to ensure consistent results
-    //             ->first();
-
-    //         if ($nextAchievement) {
-    //             $availableAchievements[] = $nextAchievement->name;
-    //         }
-    //     }
-
-    //     return $availableAchievements;
-    // }
-
     public function getNextAvailableAchievements()
     {
         $unlockedAchievements = $this->unlocked_achievements->pluck('name')->toArray();
@@ -180,23 +155,29 @@ class User extends Authenticatable
             '10 Lessons Watched',
             '25 Lessons Watched',
             '50 Lessons Watched',
-           
+
         ];
 
-        // Loop through achievements in order
+        // // Loop through achievements in order
+        // foreach ($achievementOrder as $achievementName) {
+        //     if (!in_array($achievementName, $unlockedAchievements)) {
+        //         // This is the next available achievement
+        //         $availableAchievements[] = $achievementName;
+        //         break; // Exit the loop once found
+        //     }
+        // }
+
+        // return $availableAchievements;
+
         foreach ($achievementOrder as $achievementName) {
             if (!in_array($achievementName, $unlockedAchievements)) {
-                // This is the next available achievement
                 $availableAchievements[] = $achievementName;
-                break; // Exit the loop once found
+                break; // Stop after finding the next available achievement
             }
         }
 
         return $availableAchievements;
     }
-
-
-
 
     public function getRequiredAchievementsForBadge($badgeName)
     {
@@ -232,4 +213,17 @@ class User extends Authenticatable
             $this->badges()->attach(Badge::where('name', 'Beginner')->first());
         }
     }
+
+    public function assignBadges()
+    {
+        $currentBadge = $this->getCurrentBadge();
+
+        $badge = Badge::where('name', $currentBadge)->first();
+
+        if ($badge && !$this->badges->contains($badge)) {
+            $this->badges()->attach($badge);
+        }
+    }
+
+
 }
