@@ -37,7 +37,7 @@ class UnlockCommentAchievements
         }
 
         // Attach badges based on comment-related achievements
-        $this->attachBadge($user);
+        $this->assignBadges($user);
     }
 
     private function unlockAchievement($user, $achievementName)
@@ -57,41 +57,70 @@ class UnlockCommentAchievements
         }
     }
 
-    private function attachBadge($user)
-    {
-        // Check the user's total unlocked achievements to determine the appropriate badge
-        $totalAchievements = $user->unlocked_achievements->count();
+    // private function attachBadge($user)
+    // {
+    //     dd('im here');
+    //     // Check the user's total unlocked achievements to determine the appropriate badge
+    //     $totalAchievements = $user->unlocked_achievements->count();
     
-        // Define the badge names and their corresponding achievement counts
-        $badgeMap = [
-            'Beginner' => 0,
-            'Intermediate' => 4,
-            'Advanced' => 8,
-            'Master' => 10,
+    //     // Define the badge names and their corresponding achievement counts
+    //     $badgeMap = [
+    //         'Beginner' => 0,
+    //         'Intermediate' => 4,
+    //         'Advanced' => 8,
+    //         'Master' => 10,
+    //     ];
+
+    //     // Determine the user's current badge
+    //     $currentBadge = null;
+    //     foreach ($badgeMap as $badgeName => $achievementCount) {
+    //         if ($totalAchievements >= $achievementCount) {
+    //             $currentBadge = $badgeName;
+    //         } else {
+    //             break;
+    //         }
+    //     }
+
+    //     // Attach the current badge to the user
+    //     if ($currentBadge) {
+    //         // Assuming you have a Badge model to store badges
+    //         $badge = Badge::where('name', $currentBadge)->first();
+    //         if ($badge) {
+    //             // Check if the user already has this badge to avoid duplicate attachments
+    //             if (!$user->badges->contains('name', $badge->name)) {
+    //                 // Attach the badge to the user
+    //                 $user->badges()->attach($badge->id);
+    //             }
+    //         }
+    //     }
+    // }
+
+    private function assignBadges($user)
+    {
+        // Get the user's unlocked achievements
+        $unlockedAchievements = $user->unlocked_achievements->pluck('name')->toArray();
+
+        // Define badge progression logic
+        $badgeProgression = [
+            'Beginner' => [1], // Use the ID of the 'Beginner' badge
+            'Intermediate' => [2], // Use the ID of the 'Intermediate' badge
+            'Advanced' => [3], // Use the ID of the 'Advanced' badge
+            'Master' => [4], // Use the ID of the 'Master' badge
         ];
 
-        // Determine the user's current badge
-        $currentBadge = null;
-        foreach ($badgeMap as $badgeName => $achievementCount) {
-            if ($totalAchievements >= $achievementCount) {
-                $currentBadge = $badgeName;
-            } else {
-                break;
-            }
-        }
 
-        // Attach the current badge to the user
-        if ($currentBadge) {
-            // Assuming you have a Badge model to store badges
-            $badge = Badge::where('name', $currentBadge)->first();
-            if ($badge) {
-                // Check if the user already has this badge to avoid duplicate attachments
-                if (!$user->badges->contains('name', $badge->name)) {
-                    // Attach the badge to the user
-                    $user->badges()->attach($badge->id);
-                }
-            }
+
+        // Determine the next badge the user can earn
+        $nextBadge = null;
+
+        foreach ($badgeProgression as $badgeName => $achievementNames) {
+            $nextBadge = $badgeName;
         }
+        // dd($nextBadge);
+
+        return $nextBadge;
     }
+
+
     
 }

@@ -18,7 +18,7 @@ class UsersTableSeeder extends Seeder
         $user = User::factory()->create();
 
         // Associate achievements with the user
-        $achievements = Achievement::factory()->count(5)->create();
+        $achievements = Achievement::factory()->create();
         $user->achievements()->attach($achievements);
     }
 }
